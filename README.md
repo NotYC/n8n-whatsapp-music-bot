@@ -87,7 +87,7 @@ n8n-whatsapp-music-bot/
 
 1. Use ngrok, given in repo, for port forwarding as Twilio require a public link
 2. Use Google Drive API to store music file and share that public link to twilio, bonus, make a public folder first and store songs in that folder so you dont have to change share attribute of every file.
-3. 
+
 ---
 ## 🧑‍💻 Author
 
