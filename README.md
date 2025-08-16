@@ -15,7 +15,7 @@ A WhatsApp automation built with **n8n**, **Twilio**, and **Spotify API** that l
 3. The bot replies instantly:
   ```text
    Your song is being prepared 🎶 Please wait a moment...
-```
+  ```
 4. Using the Spotify API, the bot fetches the requested track link.
 5. The song is downloaded on the local server where automation is running.
 6. The file is uploaded to Google Drive (to generate a public link, since Twilio requires it).
@@ -82,6 +82,12 @@ n8n-whatsapp-music-bot/
 
 <img width="1552" height="664" alt="image" src="https://github.com/user-attachments/assets/e3ac2923-0c09-4075-8c78-dd6ccf0764e7" />
 
+---
+## 😉Bonus Pointers
+
+1. Use ngrok, given in repo, for port forwarding as Twilio require a public link
+2. Use Google Drive API to store music file and share that public link to twilio, bonus, make a public folder first and store songs in that folder so you dont have to change share attribute of every file.
+3. 
 ---
 ## 🧑‍💻 Author
 
