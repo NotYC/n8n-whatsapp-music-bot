@@ -95,7 +95,7 @@ n8n-whatsapp-music-bot/
 
 [LinkedIn](https://www.linkedin.com/in/ycnomore/)
 
-Email:yuvrajchawla.work@gmail.com
+[Email](<yuvrajchawla.work@gmail.com>)
 
 
 
