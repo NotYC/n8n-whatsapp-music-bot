@@ -77,7 +77,8 @@ n8n-whatsapp-music-bot/
 
 ## 📸 Demo
 
-<img width="882" height="149" alt="image" src="https://github.com/user-attachments/assets/00bb89ad-2e46-45b1-852b-5b2feeed8878" />
+<img width="857" height="145" alt="image" src="https://github.com/user-attachments/assets/9e0cfce3-69d5-4339-97c8-159901f22891" />
+
 
 <img width="1552" height="664" alt="image" src="https://github.com/user-attachments/assets/e3ac2923-0c09-4075-8c78-dd6ccf0764e7" />
 
@@ -87,6 +88,7 @@ n8n-whatsapp-music-bot/
 ~YuvrajChawla
 
 [LinkedIn](https://www.linkedin.com/in/ycnomore/)
+
 [Email](yuvrajchawla.work@gmail.com)
 
 
