@@ -1,4 +1,4 @@
-n8n-whatsapp-music-bot 🎵🤖
+# n8n-whatsapp-music-bot 🎵🤖
 
 A WhatsApp automation built with n8n, Twilio, and Spotify API that lets users request songs directly over WhatsApp. The bot fetches the requested song, downloads it, and sends it back to the user.
 
