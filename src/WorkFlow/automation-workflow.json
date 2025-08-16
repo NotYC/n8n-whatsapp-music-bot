@@ -1,0 +1,459 @@
+{
+  "name": "receive-twilio copy",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "0e7b1c0c-4fc7-4afc-9d8d-163100ed21eb",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -440,
+        -80
+      ],
+      "id": "15edc6f1-2d75-46e2-bda8-2775113d01c0",
+      "name": "Webhook",
+      "webhookId": "0e7b1c0c-4fc7-4afc-9d8d-163100ed21eb"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Add a new field called 'myNewField' to the JSON of the item\nconst message = `Your Song will be ready shortly.`\n//$input.item.json.body.Body\nreturn {'message' : message,'From':$json.body.From,'To':$json.body.To, 'body':$json.body.Body};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -240,
+        -80
+      ],
+      "id": "dd7dc7bd-8a7e-44cc-a081-d5e1ad301376",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.twilio.com/2010-04-01/Accounts/<your sid>/Messages.json",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "From",
+              "value": "={{$json.To}}"
+            },
+            {
+              "name": "To",
+              "value": "={{$json.From}}"
+            },
+            {
+              "name": "Body",
+              "value": "={{$json.message}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -60,
+        -220
+      ],
+      "id": "81545a90-17e7-4d39-9689-628a06015622",
+      "name": "HTTP Request",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const msg = $json.body || \"\";\nconst match = msg.match(/play\\s+(.+)/i);\n\nif (match) {\n  console.log(`Song found, ${match}`);\n  return { songName: match[1].trim() };\n} else {\n  return { error: \"No song name found.\" };\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -60,
+        60
+      ],
+      "id": "ae71ab8b-2cc2-440d-a8c2-5da0734949ab",
+      "name": "Code1"
+    },
+    {
+      "parameters": {
+        "url": "https://api.spotify.com/v1/search",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "q",
+              "value": "={{ $json.songName }}"
+            },
+            {
+              "name": "type",
+              "value": "track"
+            },
+            {
+              "name": "limit",
+              "value": "1"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        160,
+        60
+      ],
+      "id": "34c3a06d-c916-44b5-b3eb-f8976faadaca",
+      "name": "url finder"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "afddcbe1-2fe6-4ac0-a383-ce747b1c8126",
+              "name": "name",
+              "value": "={{ $json.tracks.items[0].name }}",
+              "type": "string"
+            },
+            {
+              "id": "cad94154-60bf-4548-95bd-53b240ff2124",
+              "name": "link",
+              "value": "={{ $json.tracks.items[0].external_urls.spotify }}",
+              "type": "string"
+            },
+            {
+              "id": "d2e2844c-f4cb-4797-b683-264640a24fd0",
+              "name": "id",
+              "value": "={{ $json.tracks.items[0].uri }}",
+              "type": "string"
+            },
+            {
+              "id": "72b02132-d150-40b4-9c1c-d5c3fd99c0a7",
+              "name": "From",
+              "value": "={{ $('Code').item.json.From }}",
+              "type": "string"
+            },
+            {
+              "id": "f178ce18-23d3-4dc1-9a7f-09727eede48b",
+              "name": "To",
+              "value": "={{ $('Code').item.json.To }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        340,
+        -80
+      ],
+      "id": "54ebab1f-3aa2-47f5-9d93-27df4935d3e4",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:5555/download",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "link",
+              "value": "={{ $('Edit Fields').item.json.link }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        660,
+        -80
+      ],
+      "id": "a62dc1a9-a0ef-41d1-ab95-a23996d50e91",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "method": "DELETE",
+        "url": "http://host.docker.internal:5555/cleanup",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        860,
+        -180
+      ],
+      "id": "e1c4f875-6a1d-4a5f-9d15-7059cf9cd2ec",
+      "name": "HTTP Request2"
+    },
+    {
+      "parameters": {
+        "operation": "write",
+        "fileName": "=/home/node/{{ $json.newName }}.mp3",
+        "dataPropertyName": "=data",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        480,
+        200
+      ],
+      "id": "0c2897b1-f774-4f36-83b1-d6ac19ea93c1",
+      "name": "Read/Write Files from Disk"
+    },
+    {
+      "parameters": {
+        "jsCode": "const name = $('Edit Fields').first().json.name || \"song\";\nconst safeName = name.replace(/\\s+/g, \"_\").replace(/[^\\w\\-]/g, \"\");\n\nreturn [{ json: { 'newName': safeName } }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        500,
+        -80
+      ],
+      "id": "9f21543c-8df7-4c89-90f6-16bddff43b1b",
+      "name": "Code2"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.twilio.com/2010-04-01/Accounts/<your sid>/Messages.json",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "From",
+              "value": "={{ $('Edit Fields').item.json.To }}"
+            },
+            {
+              "name": "To",
+              "value": "={{ $('Edit Fields').item.json.From }}"
+            },
+            {
+              "name": "MediaUrl",
+              "value": "={{ $json.webContentLink }}"
+            },
+            {
+              "name": "body",
+              "value": "={{ $('Code1').item.json.songName }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        860,
+        200
+      ],
+      "id": "04497abf-6e70-44ac-a8dd-c1c967f55485",
+      "name": "HTTP Request3"
+    },
+    {
+      "parameters": {
+        "name": "={{ $json.newName }}.mp3",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "10BWM-cr6E0jcPGF2lR8oa5hfE83fw2AG",
+          "mode": "list",
+          "cachedResultName": "music",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/10BWM-cr6E0jcPGF2lR8oa5hfE83fw2AG"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        680,
+        200
+      ],
+      "id": "cceb0113-8655-4534-b43b-ff03e3e6366c",
+      "name": "Google Drive",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "l2jfXGudLEnpeXXF",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "deleteFile",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $('Google Drive').item.json.id }}",
+          "mode": "id"
+        },
+        "options": {
+          "deletePermanently": true
+        }
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1060,
+        0
+      ],
+      "id": "d26bbced-a9c0-499d-ac29-6101ca09b87c",
+      "name": "Google Drive1",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "l2jfXGudLEnpeXXF",
+          "name": "Google Drive account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "url finder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "url finder": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Code2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Read/Write Files from Disk",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code2": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read/Write Files from Disk": {
+      "main": [
+        [
+          {
+            "node": "Google Drive",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request3": {
+      "main": [
+        [
+          {
+            "node": "Google Drive1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "ce527bfe-daa7-4e6f-ab8d-ac89db97120a",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "53b6cf27c572546919744dd46d16bc5227766d961328bb96362030c0fc347d9f"
+  },
+  "id": "ASBbDHbfXaQD8ZFT",
+  "tags": []
+}
